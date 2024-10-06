@@ -1,11 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/AbdKaan/gator/internal/config"
+	"github.com/AbdKaan/gator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -14,12 +17,20 @@ func main() {
 		log.Fatalf("error trying to read config: %v", err)
 	}
 
-	config_state := state{&cfg}
+	dbURL := "postgres://postgres:postgres@localhost:5432/gator?sslmode=disable"
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	dbQueries := database.New(db)
+	config_state := state{dbQueries, &cfg}
 
 	var handlerFunctions = make(map[string]func(*state, command) error)
 	cli_commands := commands{handlerFunctions}
 
 	cli_commands.register("login", handlerLogin)
+	cli_commands.register("register", handlerRegister)
 
 	arguments := os.Args
 	if len(arguments) < 2 {
