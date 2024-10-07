@@ -35,6 +35,7 @@ func main() {
 	cli_commands.register("users", handlerListUsers)
 	cli_commands.register("agg", handlerAgg)
 	cli_commands.register("addfeed", handlerAddFeed)
+	cli_commands.register("feeds", handlerListFeeds)
 
 	arguments := os.Args
 	if len(arguments) < 2 {

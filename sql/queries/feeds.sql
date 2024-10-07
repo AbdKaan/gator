@@ -14,6 +14,10 @@ RETURNING *;
 SELECT * FROM feeds
 WHERE name = $1;
 
+-- name: GetFeedsAndUserID :many
+SELECT feeds.name, feeds.url, users.name as user_name FROM feeds
+JOIN users on feeds.user_id = users.id;
+
 -- name: ResetFeeds :exec
 DELETE FROM feeds;
 

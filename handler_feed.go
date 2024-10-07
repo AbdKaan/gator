@@ -48,3 +48,19 @@ func printFeedInfo(feed database.Feed) {
 	fmt.Printf("* URL:           %s\n", feed.Url)
 	fmt.Printf("* UserID:        %s\n", feed.UserID)
 }
+
+func handlerListFeeds(s *state, cmd command) error {
+	feeds, err := s.db.GetFeedsAndUserID(context.Background())
+	if err != nil {
+		return fmt.Errorf("couldn't get feeds: %w", err)
+	}
+
+	for i, feed := range feeds {
+		fmt.Printf("%d -\n", i+1)
+		fmt.Printf("    Name:     %s\n", feed.Name)
+		fmt.Printf("    URL:      %s\n", feed.Url)
+		fmt.Printf("    Username: %s\n", feed.UserName)
+	}
+
+	return nil
+}
