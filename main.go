@@ -33,6 +33,7 @@ func main() {
 	cli_commands.register("register", handlerRegister)
 	cli_commands.register("reset", handlerReset)
 	cli_commands.register("users", handlerListUsers)
+	cli_commands.register("agg", handlerAgg)
 
 	arguments := os.Args
 	if len(arguments) < 2 {
