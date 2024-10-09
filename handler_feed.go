@@ -31,12 +31,24 @@ func handlerAddFeed(s *state, cmd command) error {
 		Url:       url,
 		UserID:    user_id,
 	})
-
 	if err != nil {
 		return fmt.Errorf("couldn't add the feed: %w", err)
 	}
+
+	newFeedFollow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user_id,
+		FeedID:    new_feed.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("couldn't add the feedFollow: %v, with error: %w", newFeedFollow, err)
+	}
+
 	fmt.Println("Feed has been added.")
 	printFeedInfo(new_feed)
+
 	return nil
 }
 
@@ -50,7 +62,7 @@ func printFeedInfo(feed database.Feed) {
 }
 
 func handlerListFeeds(s *state, cmd command) error {
-	feeds, err := s.db.GetFeedsAndUserID(context.Background())
+	feeds, err := s.db.GetFeedsAndUserName(context.Background())
 	if err != nil {
 		return fmt.Errorf("couldn't get feeds: %w", err)
 	}
