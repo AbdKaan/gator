@@ -10,15 +10,11 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerFollowFeed(s *state, cmd command) error {
+func handlerFollowFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 1 {
 		return errors.New("follow command requires 1 argument: follow <url>")
 	}
 
-	user, err := s.db.GetUser(context.Background(), s.cfg.Current_user_name)
-	if err != nil {
-		return fmt.Errorf("problem occured trying to get current user: %w", err)
-	}
 	userID := user.ID
 
 	url := cmd.arguments[0]

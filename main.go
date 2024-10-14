@@ -34,9 +34,9 @@ func main() {
 	cli_commands.register("reset", handlerReset)
 	cli_commands.register("users", handlerListUsers)
 	cli_commands.register("agg", handlerAgg)
-	cli_commands.register("addfeed", handlerAddFeed)
+	cli_commands.register("addfeed", middlewareLoggedIn(handlerAddFeed))
 	cli_commands.register("feeds", handlerListFeeds)
-	cli_commands.register("follow", handlerFollowFeed)
+	cli_commands.register("follow", middlewareLoggedIn(handlerFollowFeed))
 	cli_commands.register("following", handlerFollowing)
 
 	arguments := os.Args
