@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -146,14 +147,31 @@ func (q *Queries) GetFeedsAndUserName(ctx context.Context) ([]GetFeedsAndUserNam
 }
 
 const getNextFeedToFetch = `-- name: GetNextFeedToFetch :one
-SELECT id, created_at, updated_at, name, url, user_id, last_fetched_at FROM feeds
+SELECT feeds.id, feeds.created_at, feeds.updated_at, name, url, feeds.user_id, last_fetched_at, feed_follows.id, feed_follows.created_at, feed_follows.updated_at, feed_follows.user_id, feed_id FROM feeds
+JOIN feed_follows ON feeds.id = feed_follows.feed_id
+WHERE feed_follows.user_id = $1
 ORDER BY last_fetched_at NULLS FIRST
 LIMIT 1
 `
 
-func (q *Queries) GetNextFeedToFetch(ctx context.Context) (Feed, error) {
-	row := q.db.QueryRowContext(ctx, getNextFeedToFetch)
-	var i Feed
+type GetNextFeedToFetchRow struct {
+	ID            uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Name          string
+	Url           string
+	UserID        uuid.UUID
+	LastFetchedAt sql.NullTime
+	ID_2          uuid.UUID
+	CreatedAt_2   time.Time
+	UpdatedAt_2   time.Time
+	UserID_2      uuid.UUID
+	FeedID        uuid.UUID
+}
+
+func (q *Queries) GetNextFeedToFetch(ctx context.Context, userID uuid.UUID) (GetNextFeedToFetchRow, error) {
+	row := q.db.QueryRowContext(ctx, getNextFeedToFetch, userID)
+	var i GetNextFeedToFetchRow
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
@@ -162,6 +180,11 @@ func (q *Queries) GetNextFeedToFetch(ctx context.Context) (Feed, error) {
 		&i.Url,
 		&i.UserID,
 		&i.LastFetchedAt,
+		&i.ID_2,
+		&i.CreatedAt_2,
+		&i.UpdatedAt_2,
+		&i.UserID_2,
+		&i.FeedID,
 	)
 	return i, err
 }
